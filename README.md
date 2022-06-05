@@ -38,9 +38,12 @@ $ sudo apt autoremove
 $ curl -fsSL https://get.docker.com -o get-docker.sh
 $ sudo sh get-docker.sh
 $ sudo pip3 install docker-compose
+
 $ sudo usermod -aG docker <user>
 $ sudo usermod -aG docker Pi
 $ sudo systemctl enable docker
+
+$ docker network create pi
 ```
 
 
@@ -68,6 +71,9 @@ The SMB share can be accessed via this address: `\\raspberrypi\<user>`.
 
 ## Container Setup
 
+> Note: All containers are connected to the Docker Network "pi" so that they can communicate with each other.
+
+
 ### Redis
 
 ```bash
@@ -79,6 +85,7 @@ $ echo "alias redis-cli='docker exec -it redis redis-cli'" >> ~/.bashrc
 $ docker run -d \
     --name redis \
     --restart unless-stopped \
+    --network pi \
     -v ~/redis/redis.conf:/usr/local/etc/redis/redis.conf \
     -v ~/redis/data:/data \
     -p 6379:6379 \
@@ -102,14 +109,25 @@ appendfsync no
 ### Mosquito MQTT Broker
 
 ```bash
-$ mkdir -p mosquitto/data
+$ mkdir -p mosquitto/config
+$ echo "listener 1883 0.0.0.0" >> mosquitto/config/mosquitto.conf
+$ echo "allow_anonymous true" >> mosquitto/config/mosquitto.conf
 $ docker run -d \
     --name mosquitto \
     --restart unless-stopped \
-    -v ~/mosquitto/data:/mosquitto/data \
+    --network pi \
+    -v ~/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf \
     -p 1883:1883 \
-    -p 9001:9001 \
     eclipse-mosquitto:latest
+```
+
+Testing the MMQT Broker with Python:
+
+```python
+import paho.mqtt.client as mqtt
+client = mqtt.client()
+client.connect('localhost', 1883)
+client.disconnect()
 ```
 
 
@@ -123,6 +141,7 @@ $ echo "alias nodered-bash='docker exec -it nodered /bin/bash" >> ~/.bashrc
 $ docker run -d \
     --name nodered \
     --restart unless-stopped \
+    --network pi \
     -v ~/nodered/data:/data \
     -p 1880:1880 \
     nodered/node-red:latest
