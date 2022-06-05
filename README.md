@@ -99,9 +99,17 @@ appendfsync no
 ```
 
 
-### Mosquito MQTT
+### Mosquito MQTT Broker
 
 ```bash
+$ mkdir -p mosquitto/data
+$ docker run -d \
+    --name mosquitto \
+    --restart unless-stopped \
+    -v ~/mosquitto/data:/mosquitto/data \
+    -p 1883:1883 \
+    -p 9001:9001 \
+    eclipse-mosquitto:latest
 ```
 
 
@@ -117,6 +125,5 @@ $ docker run -d \
     --restart unless-stopped \
     -v ~/nodered/data:/data \
     -p 1880:1880 \
-    -e NODE_OPTIONS="--max_old_space_size=256" \
     nodered/node-red:latest
 ```
