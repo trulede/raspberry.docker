@@ -106,7 +106,7 @@ appendfsync no
 ```
 
 
-### Mosquito MQTT Broker
+### Mosquitto MQTT Broker
 
 ```bash
 $ mkdir -p mosquitto/config
