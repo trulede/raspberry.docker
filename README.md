@@ -51,7 +51,7 @@ $ docker network create pi
 
 ```bash
 $ sudo nano /etc/samba/smb.conf   # see partial sample below
-$ sudo smbpasswd -a trule
+$ sudo smbpasswd -a <user>
 $ sudo systemctl restart smbd
 ```
 
