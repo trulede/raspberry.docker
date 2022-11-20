@@ -51,7 +51,7 @@ $ docker network create pi
 
 ```bash
 $ sudo nano /etc/samba/smb.conf   # see partial sample below
-$ sudo smbpasswd -a trule
+$ sudo smbpasswd -a <user>
 $ sudo systemctl restart smbd
 ```
 
@@ -106,7 +106,7 @@ appendfsync no
 ```
 
 
-### Mosquito MQTT Broker
+### Mosquitto MQTT Broker
 
 ```bash
 $ mkdir -p containers/mosquitto/config
