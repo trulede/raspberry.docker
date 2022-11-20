@@ -77,8 +77,8 @@ The SMB share can be accessed via this address: `\\raspberrypi\<user>`.
 ### Redis
 
 ```bash
-$ mkdir redis
-$ cd redis
+$ mkdir -p containers/redis
+$ cd containers/redisredis
 $ curl -O https://raw.githubusercontent.com/antirez/redis/7.0/redis.conf
 $ vim redis.conf   # see partial sample below
 $ echo "alias redis-cli='docker exec -it redis redis-cli'" >> ~/.bashrc
@@ -86,8 +86,8 @@ $ docker run -d \
     --name redis \
     --restart unless-stopped \
     --network pi \
-    -v ~/redis/redis.conf:/usr/local/etc/redis/redis.conf \
-    -v ~/redis/data:/data \
+    -v ~/containers/redis/redis.conf:/usr/local/etc/redis/redis.conf \
+    -v ~/containers/redis/data:/data \
     -p 6379:6379 \
     redis:latest \
     redis-server /usr/local/etc/redis/redis.conf
@@ -109,14 +109,14 @@ appendfsync no
 ### Mosquito MQTT Broker
 
 ```bash
-$ mkdir -p mosquitto/config
-$ echo "listener 1883 0.0.0.0" >> mosquitto/config/mosquitto.conf
-$ echo "allow_anonymous true" >> mosquitto/config/mosquitto.conf
+$ mkdir -p containers/mosquitto/config
+$ echo "listener 1883 0.0.0.0" >> containers/mosquitto/config/mosquitto.conf
+$ echo "allow_anonymous true" >> containers/mosquitto/config/mosquitto.conf
 $ docker run -d \
     --name mosquitto \
     --restart unless-stopped \
     --network pi \
-    -v ~/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf \
+    -v ~/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf \
     -p 1883:1883 \
     eclipse-mosquitto:latest
 ```
@@ -125,7 +125,7 @@ Testing the MMQT Broker with Python:
 
 ```python
 import paho.mqtt.client as mqtt
-client = mqtt.client()
+client = mqtt.Client()
 client.connect('localhost', 1883)
 client.disconnect()
 ```
@@ -136,13 +136,15 @@ client.disconnect()
 Extremely helpful guide:  [Running under Docker](https://nodered.org/docs/getting-started/docker).
 
 ```bash
-$ mkdir -p nodered/data
+$ mkdir -p containers/nodered/data
 $ echo "alias nodered-bash='docker exec -it nodered /bin/bash" >> ~/.bashrc
 $ docker run -d \
     --name nodered \
     --restart unless-stopped \
     --network pi \
-    -v ~/nodered/data:/data \
+    -v ~/containers/nodered/data:/data \
     -p 1880:1880 \
     nodered/node-red:latest
 ```
+
+The open Node-RED at http://localhost:1880.
