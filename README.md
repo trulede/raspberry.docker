@@ -74,30 +74,19 @@ The SMB share can be accessed via this address: `\\raspberrypi\<user>`.
 > Note: All containers are connected to the Docker Network "pi" so that they can communicate with each other.
 
 
-### Redis
+### Configuration Files
+
+#### Redis
 
 ```bash
-$ mkdir -p containers/redis
-$ cd containers/redisredis
+$ mkdir -p ~/containers/redis
+$ cd ~/containers/redis
 $ curl -O https://raw.githubusercontent.com/antirez/redis/7.0/redis.conf
 $ vim redis.conf   # see partial sample below
 $ echo "alias redis-cli='docker exec -it redis redis-cli'" >> ~/.bashrc
-$ docker run -d \
-    --name redis \
-    --restart unless-stopped \
-    --network pi \
-    -v ~/containers/redis/redis.conf:/usr/local/etc/redis/redis.conf \
-    -v ~/containers/redis/data:/data \
-    -p 6379:6379 \
-    redis:latest \
-    redis-server /usr/local/etc/redis/redis.conf
-$ redis-cli set foo bar
-OK
-$ redis-cli get foo
-"bar"
 ```
 
-~/redis/redis.conf
+~/containers/redis/redis.conf
 ```inifile
 databases 2
 maxmemory 256mb
@@ -106,20 +95,54 @@ appendfsync no
 ```
 
 
-### Mosquitto MQTT Broker
+#### Mosquitto MQTT Broker
 
 ```bash
-$ mkdir -p containers/mosquitto/config
-$ echo "listener 1883 0.0.0.0" >> containers/mosquitto/config/mosquitto.conf
-$ echo "allow_anonymous true" >> containers/mosquitto/config/mosquitto.conf
-$ docker run -d \
-    --name mosquitto \
-    --restart unless-stopped \
-    --network pi \
-    -v ~/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf \
-    -p 1883:1883 \
-    eclipse-mosquitto:latest
+$ mkdir -p ~/containers/mosquitto/config
+$ echo "listener 1883 0.0.0.0" >> ~/containers/mosquitto/config/mosquitto.conf
+$ echo "allow_anonymous true" >> ~/containers/mosquitto/config/mosquitto.conf
 ```
+
+#### Node Red
+
+Extremely helpful guide:  [Running under Docker](https://nodered.org/docs/getting-started/docker).
+
+```bash
+$ mkdir -p ~/containers/nodered/data
+$ echo "alias nodered-bash='docker exec -it nodered /bin/bash" >> ~/.bashrc
+```
+
+
+### Docker Compose (to start containers)
+
+```bash
+$ docker network create pi
+$ docker compose up -d
+Running 3/3
+Container nodered    Started
+Container redis      Started
+Container mosquitto  Started
+$ docker compose ps
+NAME                SERVICE     STATUS    PORTS
+mosquitto           mosquitto   running   0.0.0.0:1883->1883/tcp, :::1883->1883/tcp
+nodered             nodered     running   0.0.0.0:1880->1880/tcp, :::1880->1880/tcp
+redis               redis       running   0.0.0.0:6379->6379/tcp, :::6379->6379/tcp
+```
+
+
+### Testing the Containers/Services
+
+#### Redis
+
+```bash
+$ redis-cli set foo bar
+OK
+$ redis-cli get foo
+"bar"
+```
+
+
+#### Mosquitto MQTT Broker
 
 Testing the MMQT Broker with Python:
 
@@ -131,20 +154,6 @@ client.disconnect()
 ```
 
 
-### Node Red
-
-Extremely helpful guide:  [Running under Docker](https://nodered.org/docs/getting-started/docker).
-
-```bash
-$ mkdir -p containers/nodered/data
-$ echo "alias nodered-bash='docker exec -it nodered /bin/bash" >> ~/.bashrc
-$ docker run -d \
-    --name nodered \
-    --restart unless-stopped \
-    --network pi \
-    -v ~/containers/nodered/data:/data \
-    -p 1880:1880 \
-    nodered/node-red:latest
-```
+#### Node Red
 
 The open Node-RED at http://localhost:1880.

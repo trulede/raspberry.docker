@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import json
 
 
 def publish_message(broker, topic, message):
@@ -9,4 +10,9 @@ def publish_message(broker, topic, message):
     client.disconnect()
 
 
+# Simple message.
 publish_message('localhost', 'test_hw', 'Hello from Python Example!')
+
+# JSON payload.
+payload = {'hello': 'world'}
+publish_message('localhost', 'test_hw', json.dumps(payload))

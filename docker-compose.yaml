@@ -1,0 +1,39 @@
+version: "3.7"
+
+networks:
+  pi:
+    name: pi
+    external: true
+
+services:
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    volumes:
+      - ~/containers/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ~/containers/redis/data:/data
+    networks:
+      - pi
+  
+  mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    ports:
+      - 1883:1883
+    volumes:
+      - ~/containers/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - pi
+  
+  nodered:
+    container_name: nodered
+    image: nodered/node-red:latest
+    ports:
+      - 1880:1880
+    volumes:
+      - ~/containers/nodered/data:/data
+    networks:
+      - pi
