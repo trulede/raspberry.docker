@@ -116,6 +116,11 @@ $ echo "alias nodered-bash='docker exec -it nodered /bin/bash" >> ~/.bashrc
 ### Docker Compose (to start containers)
 
 ```bash
+# Clone this repo.
+$ git clone https://github.com/trulede/raspberry.docker.git
+$ cd raspberry.docker
+
+# Setup and start the Docker containers/services.
 $ docker network create pi
 $ docker compose up -d
 Running 3/3
