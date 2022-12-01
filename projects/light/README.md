@@ -37,8 +37,27 @@ The controlling software stack (Node-RED and Mosquitto) may be hosted on the Ras
 
 #### Button Configuration
 
-> TODO: Determine button configuration. Button configuration may be done with a CLI tool or via Shelly App.
+A Shelly Button1 can be configured with 4 button press actions:
 
+* Short Push.
+* 2xShort Push.
+* 3xShort Push.
+* Long Push (parameter `longpush_duration_ms_max`: 800 2000 mSec).
+
+
+Additional parameters to be programmed:
+
+* remain_awake (0..5 sec)
+* longpush_duration_ms_max (800..2000 mSec)
+* multipush_time_between_pushes_ms_max (200..2000 mSec)
+* actions (shortpush_url, double_shortpush_url, triple_shortpush_url & longpush_url)
+  * index (0)
+  * urls (string array)
+  * enabled
+* led_status_disable (boolean)
+
+
+> API DOC : [Shelly Button1 Overview](https://shelly-api-docs.shelly.cloud/gen1/#shelly-button1-overview)
 
 #### Button Behaviour
 
@@ -72,3 +91,16 @@ RFID Cards are individually programmed with a feature set that corresponds to th
 | Lights On | Card touch | Lights Off. |
 | Lights On | Card touch >1s | Lights Colour (cycle preset colour values each 1s). |
 | Lights Colour | Card remove | Lights On. |
+
+
+
+## Bringup
+
+### Python Package
+
+```bash
+$ python -m pip install -e .
+$ export PATH=~/.local/bin:$PATH
+$ shellylight
+Shelly Light Project: CLI
+```
