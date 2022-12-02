@@ -25,9 +25,7 @@ The controlling software stack (Node-RED and Mosquitto) may be hosted on the Ras
 * Mosquitto MQTT broker
 * Possible PN532 drivers:
   * https://github.com/nfc-tools/libnfc
-  * https://github.com/ikelos/pynfc
   * https://github.com/adafruit/Adafruit_CircuitPython_PN532
-  * https://github.com/adafruit/Adafruit_Python_PN532
 
 
 
