@@ -138,7 +138,7 @@ and the DIP switch to:
 * RX = OFF
 * TX = OFF
 
-Now connect the PN532 NFC HAT to the Raspberry PI. Further documentation available in the [PN532 NFC HAT Wiki](https://www.waveshare.com/wiki/PN532_NFC_HAT)
+Now connect the PN532 NFC HAT to the Raspberry PI. Further documentation available in the [PN532 NFC HAT Wiki](https://www.waveshare.com/wiki/PN532_NFC_HAT), [PN532 Datasheet](https://www.waveshare.com/w/upload/f/f1/Pn532ds.pdf) or [PN532 User Manual](https://www.waveshare.com/w/upload/b/bb/Pn532um.pdf).
 
 
 ```bash
