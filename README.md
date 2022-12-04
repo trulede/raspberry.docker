@@ -1,5 +1,11 @@
 # raspberry.docker
-Raspberry Pi with Docker
+
+Raspberry Pi with Docker.
+
+### Included Projects:
+
+* [Light](projects/light/README.md) - Shelly light controller using RFID (PN532 NFC HAT), NodeRED and Python. `shellylight` CLI application includes RFID subcommand for programming RFID cards.
+
 
 
 ## Raspberry PI OS
