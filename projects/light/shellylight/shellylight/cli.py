@@ -4,12 +4,15 @@ from .switch import switch_parser
 
 
 def main():
-    print('Shelly Light Project: CLI')
-    parser = argparse.ArgumentParser(description='Shelly Light Project')
-    subparsers = parser.add_subparsers()
-    rfid_parser(subparsers.add_parser('rfid'))
-    switch_parser(subparsers.add_parser('switch'))
+    parser = argparse.ArgumentParser(
+        prog='shellylight',
+        description='Shelly Light Project',
+    )
+    subparsers = parser.add_subparsers(help='commands')
+    rfid_parser(subparsers.add_parser('rfid', help='RFID Command'))
+    switch_parser(subparsers.add_parser('switch', help='Switch Command'))
     args = parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":

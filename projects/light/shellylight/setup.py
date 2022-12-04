@@ -14,4 +14,7 @@ setup(name='shellylight',
             'shellylight=shellylight.cli:main'
         ],
     },
+    install_requires = [
+        'Adafruit-Blinka',
+    ]
 )

@@ -60,7 +60,7 @@ Additional parameters to be programmed:
 #### Button Behaviour
 
 | State   | Button Press  | Action  |
-|:-:|:-:|---|
+|:--|:--|---|
 | Lights Off | Single Press  | Main light on. |
 | Lights Off | Double/Long Press  | Lights On (at previous brightness, colour). |
 | Lights On | Single Press | All lights Off. |
@@ -82,7 +82,7 @@ RFID Cards are individually programmed with a feature set that corresponds to th
 #### Card Behaviours
 
 | State   | Card  | Action  |
-|:-:|:-:|---|
+|:--|:--|---|
 | Lights Off | Card touch  | Lights On (at previous brightness, colour). |
 | Lights Off | Card touch >1s  | Lights Brightness (cycle preset brightness values each 1s). |
 | Lights Brightness  | Card remove | Lights On. |
@@ -97,8 +97,65 @@ RFID Cards are individually programmed with a feature set that corresponds to th
 ### Python Package
 
 ```bash
+$ git clone https://github.com/trulede/raspberry.docker.git
+$ cd raspberry.docker/projects/light/shellylight
 $ python -m pip install -e .
+
+# Normally your shell will have this PATH set.
 $ export PATH=~/.local/bin:$PATH
-$ shellylight
-Shelly Light Project: CLI
+
+# Run the CLI application.
+$ shellylight --help
+usage: shellylight [-h] {rfid,switch} ...
+
+Shelly Light Project
+
+positional arguments:
+  {rfid,switch}  commands
+    rfid         RFID Command
+    switch       Switch Command
+
+optional arguments:
+  -h, --help     show this help message and exit
+```
+
+### PN532 NFC HAT
+
+On the PN532 NFC HAT, set the following jumpers:
+
+* L0 -> L
+* L1 -> H
+* RSTPDN -> D20
+
+and the DIP switch to:
+
+* SCK = ON
+* MISO = ON
+* MOSI = ON
+* NSS = ON (P4/D4/BCM)
+* SCL = OFF
+* SDA = OFF
+* RX = OFF
+* TX = OFF
+
+Now connect the PN532 NFC HAT to the Raspberry PI. Further documentation available in the [PN532 NFC HAT Wiki](https://www.waveshare.com/wiki/PN532_NFC_HAT)
+
+
+```bash
+# Enable SPI.
+$ sudo raspi-config
+
+# Run the RFID Listen command.
+$ shellylight rfid --listen
+RFID Listen using PN532 with SPI connection ...
+PN532: ic=50, ver=1, rev=6
+Listening for cards (ctrl-c to exit) ...
+Card found, UID=6a 53 7a 15
+  MiFare Blocks:
+  [00] 6a 53 7a 15 56 08 04 00 62 63 64 65 66 67 68 69    jSz.V...bcdefghi
+  [01] 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+  ...
+  NTAG Blocks:
+Block scan complete.
+Card removed.
 ```
