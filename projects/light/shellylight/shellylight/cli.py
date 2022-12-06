@@ -1,6 +1,13 @@
+import types
 import argparse
-from .rfid import rfid_parser
-from .switch import switch_parser
+
+
+def register_subparsers(module_dict, subparsers):
+    for name, value in module_dict.items():
+        if name == 'register_parser' and callable(value):
+            value(subparsers)
+        elif isinstance(value, types.ModuleType):
+            register_subparsers(value.__dict__, subparsers)
 
 
 def main():
@@ -9,8 +16,7 @@ def main():
         description='Shelly Light Project',
     )
     subparsers = parser.add_subparsers(help='commands')
-    rfid_parser(subparsers.add_parser('rfid', help='RFID Command'))
-    switch_parser(subparsers.add_parser('switch', help='Switch Command'))
+    register_subparsers(globals(), subparsers)
     args = parser.parse_args()
     args.func(args)
 

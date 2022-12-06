@@ -9,6 +9,10 @@ from .pn532.spi import PN532_SPI
 from .pn532.pn532 import MIFARE_CMD_AUTH_A
 
 
+def register_parser(subparsers):
+    rfid_parser(subparsers.add_parser('rfid', help='RFID Command'))
+
+
 def rfid_parser(subparser):
     subparser.add_argument('--listen', action='store_true',
             help='Run the RFID Listen function.')
