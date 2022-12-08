@@ -1,16 +1,13 @@
 import types
 import argparse
 import inspect
-from shellylight import *
+from .rfid import register_parser as rfid_register_parser
+from .switch import register_parser as switch_register_parser
 
 
 def register_subparsers(subparsers):
-    for k, v in inspect.getmembers(shellylight, predicate=inspect.ismodule):
-        print(k)
-        for name, func in inspect.getmembers(v, predicate=inspect.isfunction):
-            print(name)
-            if name == 'register_parser':
-                func(subparsers)
+    rfid_register_parser(subparsers)
+    switch_register_parser(subparsers)
 
 
 def main():
