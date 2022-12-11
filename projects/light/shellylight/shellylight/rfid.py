@@ -46,9 +46,9 @@ def rfid_parser(subparser):
     program_group.add_argument('--name', type=str,
             help='Program this name on the Card.')
     program_group.add_argument('--actions', choices=_actions, nargs='*',
-            help='Configure these actions on the Card.')
+            default=[], help='Configure these actions on the Card.')
     program_group.add_argument('--lights', choices=_lights, nargs='*',
-            help='Control these groups of lights with the Card.')
+            default=[], help='Control these groups of lights with the Card.')
     # Group MQTT.
     mqtt_group = subparser.add_argument_group('MQTT')
     program_group.add_argument('--mqtt', action='store_true',
@@ -57,22 +57,71 @@ def rfid_parser(subparser):
             help='Send MQTT messages to this MQTT Broker.')
 
 
+def encode_actions(actions):
+    if 'All' in actions:
+        actions = _actions
+        actions.remove('All')
+    encoding = ','.join([v[:2] for v in actions])
+    return encoding
+
+
+def encode_lights(lights):
+    if 'All' in lights:
+        lights = _lights
+        lights.remove('All')
+    encoding = ','.join([v[:2] for v in lights])
+    return encoding
+
+
 def rfid_command(args):
     if args.listen:
         listen(args.uidonly)
+    elif args.program:
+        program(name=args.name, actions=args.actions, lights=args.lights)
 
 
 def dump_block(bn, block):
+    if not block:
+        return
     hex = " ".join([format(i, "02x") for i in block])
     asc = "".join([chr(i) if chr(i) in string.printable else '.' for i in block])
     print(f'  [{bn:02}] {hex}    {asc}')
+
+
+def write_block(pn532, uid, bn, block):
+    data = bytes(block, 'ascii')
+    data = (data + b' '*16)[:16]
+    print(f' write {data} @ {bn}')
+    key_a = b'\xFF\xFF\xFF\xFF\xFF\xFF'
+    try:
+        pn532.mifare_classic_authenticate_block(
+            uid, block_number=bn,
+            key_number=MIFARE_CMD_AUTH_A, key=key_a)
+        block = pn532.mifare_classic_write_block(bn, data)
+        return block
+    except Exception as e:
+        print(e)
+    return None
+
+
+def read_block(pn532, uid, bn):
+    key_a = b'\xFF\xFF\xFF\xFF\xFF\xFF'
+    try:
+        pn532.mifare_classic_authenticate_block(
+            uid, block_number=bn,
+            key_number=MIFARE_CMD_AUTH_A, key=key_a)
+        block = pn532.mifare_classic_read_block(bn)
+        return block
+    except Exception as e:
+        print(e)
+    return None
 
 
 def signal_handler(sig, frame):
     exit(0)
 
 
-def listen(uidonly):
+def setup_pn532():
     # Setup PN532 with SPI connection.
     print(f'RFID Listen using PN532 with SPI connection ...')
     spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
@@ -82,8 +131,11 @@ def listen(uidonly):
 
     # Enable MiFare cards (i.e. for the supplied blue token).
     pn532.SAM_configuration()
-    
-    # Listen for cards.
+
+    return pn532
+
+
+def wait_for_card(pn532):
     print('Listening for cards (ctrl-c to exit) ...')
     signal.signal(signal.SIGINT, signal_handler)
     while True:
@@ -93,31 +145,52 @@ def listen(uidonly):
             continue
         # Have a card, read.
         print(f'Card found, UID={" ".join([format(i, "02x") for i in uid])}')
-        if not uidonly:
-            print(f'  MiFare Blocks:')
-            key_a = b'\xFF\xFF\xFF\xFF\xFF\xFF'
-            for bn in range(64):
-                try:
-                    pn532.mifare_classic_authenticate_block(
-                        uid, block_number=bn,
-                        key_number=MIFARE_CMD_AUTH_A, key=key_a)
-                    block = pn532.mifare_classic_read_block(bn)
-                    if block:
-                        dump_block(bn, block)
-                    else:
-                        break
-                except exception as e:
-                    print(e)
-            print(f'  NTAG Blocks:')
-            for bn in range(135):
-                block = pn532.ntag2xx_read_block(bn)
-                if block:
+        return uid
+
+    return None  # Code never hit.
+
+
+def wait_for_no_card(pn532):
+    while pn532.read_passive_target(timeout=0.2):
+        pass
+    print('Card removed.')
+
+
+def listen(uidonly):
+    pn532 = setup_pn532()
+    while True:
+        # Listen for cards.
+        uid = wait_for_card(pn532)
+        if uid:
+            # Read Blocks
+            if not uidonly:
+                print(f'  MiFare Blocks:')
+                key_a = b'\xFF\xFF\xFF\xFF\xFF\xFF'
+                for bn in range(16):
+                    block = read_block(pn532, uid, bn)
                     dump_block(bn, block)
-                else:
-                    break
-            if pn532.read_passive_target(timeout=0.1):
-                print('Block scan complete.')
+            # Wait for the card to be removed.
+            wait_for_no_card(pn532)
+
+
+def program(name=None, actions=None, lights=[None]):
+    pn532 = setup_pn532()
+
+    # Listen for cards.
+    uid = wait_for_card(pn532)
+    if uid:
+        # Don't write to blocks 4N+3 (3, 7 ..) as they contain block passwords.
+        # Program the Name (block 6).
+        if name:
+            write_block(pn532, uid, 6, name)
+        # Program the Actions (block 8).
+        write_block(pn532, uid, 8, encode_actions(actions))
+        # Program the Lights (block 9).
+        write_block(pn532, uid, 9, encode_lights(lights))
+        # Read back the blocks.
+        for bn in (6,8,9):
+            block = read_block(pn532, uid, bn)
+            dump_block(bn, block)
+
         # Wait for the card to be removed.
-        while pn532.read_passive_target(timeout=0.2):
-            pass
-        print('Card removed.')
+        wait_for_no_card(pn532)
