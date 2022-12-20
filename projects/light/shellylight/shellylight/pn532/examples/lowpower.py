@@ -19,7 +19,7 @@ print("Found PN532 with firmware version: {0}.{1}".format(ver, rev))
 # Configure PN532 to communicate with MiFare cards
 pn532.SAM_configuration()
 
-print("Waiting for RFID/NFC card...")
+print("Waiting for NFC/NFC card...")
 while True:
     uid = pn532.read_passive_target(timeout=0.5)
     if uid:

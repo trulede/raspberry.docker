@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this project we connect several Shelly controlled lights to a WLan, and then control those lights with Node-RED flows, which themselves are activated by an RFID Card/Reader. The RFID Reader is connected to a Raspberry PI which has a simple driver to trigger Node-RED flows,
+In this project we connect several Shelly controlled lights to a WLan, and then control those lights with Node-RED flows, which themselves are activated by an NFC Card/Reader. The NFC Reader is connected to a Raspberry PI which has a simple driver to trigger Node-RED flows,
 
 The controlling software stack (Node-RED and Mosquitto) may be hosted on the Raspberry PI or some other device connected to the same network (e.g. a NAS that can run Docker containers).
 
@@ -70,13 +70,13 @@ Additional parameters to be programmed:
 | Lights Colour | Single Press | Lights On. |
 
 
-### RFID Card
+### NFC Card
 
 #### Card Programming
 
-RFID Cards are individually programmed with a feature set that corresponds to the States of the Light Controller. Therefore each RFID Card can  be programmed to have only a subset of the possible Card Behaviours (see following section for a list of those behaviours).
+NFC Cards are individually programmed with a feature set that corresponds to the States of the Light Controller. Therefore each NFC Card can  be programmed to have only a subset of the possible Card Behaviours (see following section for a list of those behaviours).
 
-> TODO: Determine RFID Card programming layout. CLI tool will be required.
+> TODO: Determine NFC Card programming layout. CLI tool will be required.
 
 
 #### Card Behaviours
@@ -106,13 +106,13 @@ $ export PATH=~/.local/bin:$PATH
 
 # Run the CLI application.
 $ shellylight --help
-usage: shellylight [-h] {rfid,switch} ...
+usage: shellylight [-h] {nfc,switch} ...
 
 Shelly Light Project
 
 positional arguments:
-  {rfid,switch}  commands
-    rfid         RFID Command
+  {nfc,switch}  commands
+    nfc         NFC Command
     switch       Switch Command
 
 optional arguments:
@@ -145,9 +145,9 @@ Now connect the PN532 NFC HAT to the Raspberry PI. Further documentation availab
 # Enable SPI.
 $ sudo raspi-config
 
-# Run the RFID Listen command.
-$ shellylight rfid --listen
-RFID Listen using PN532 with SPI connection ...
+# Run the NFC Listen command.
+$ shellylight nfc --listen
+NFC Listen using PN532 with SPI connection ...
 PN532: ic=50, ver=1, rev=6
 Listening for cards (ctrl-c to exit) ...
 Card found, UID=6a 53 7a 15

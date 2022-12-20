@@ -5,7 +5,7 @@
 
 """
 This example shows connecting to the PN532 and writing & reading an ntag2xx
-type RFID tag
+type NFC tag
 """
 
 import board
@@ -49,7 +49,7 @@ print("Found PN532 with firmware version: {0}.{1}".format(ver, rev))
 # Configure PN532 to communicate with MiFare cards
 pn532.SAM_configuration()
 
-print("Waiting for RFID/NFC card to write to!")
+print("Waiting for NFC/NFC card to write to!")
 while True:
     # Check if a card is available to read
     uid = pn532.read_passive_target(timeout=0.5)

@@ -1,12 +1,12 @@
 import types
 import argparse
 import inspect
-from .rfid import register_parser as rfid_register_parser
+from .nfc import register_parser as nfc_register_parser
 from .switch import register_parser as switch_register_parser
 
 
 def register_subparsers(subparsers):
-    rfid_register_parser(subparsers)
+    nfc_register_parser(subparsers)
     switch_register_parser(subparsers)
 
 

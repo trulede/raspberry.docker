@@ -6,7 +6,7 @@
 ``adafruit_pn532``
 ====================================================
 
-This module will let you communicate with a PN532 RFID/NFC shield or breakout
+This module will let you communicate with a PN532 NFC/NFC shield or breakout
 using I2C, SPI or UART.
 
 * Author(s): Original Raspberry Pi code by Tony DiCola, CircuitPython by ladyada

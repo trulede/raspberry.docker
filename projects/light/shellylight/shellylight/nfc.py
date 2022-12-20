@@ -28,15 +28,15 @@ _lights = [
 
 
 def register_parser(subparsers):
-    rfid_parser(subparsers.add_parser('rfid', help='RFID Command'))
+    nfc_parser(subparsers.add_parser('nfc', help='NFC Command'))
 
 
-def rfid_parser(subparser):
-    subparser.set_defaults(func=rfid_command)
+def nfc_parser(subparser):
+    subparser.set_defaults(func=nfc_command)
     # Group Listen.
     listen_group = subparser.add_argument_group('Listen')
     listen_group.add_argument('--listen', action='store_true',
-            help='Run the RFID Listen function.')
+            help='Run the NFC Listen function.')
     listen_group.add_argument('--uidonly', action='store_true',
             help='Only dump the Card UID to console.')
     # Group Program.
@@ -52,7 +52,7 @@ def rfid_parser(subparser):
     # Group MQTT.
     mqtt_group = subparser.add_argument_group('MQTT')
     program_group.add_argument('--mqtt', action='store_true',
-            help='Monitor the RFID and send MQTT messages when Cards are detected.')
+            help='Monitor the NFC and send MQTT messages when Cards are detected.')
     mqtt_group.add_argument('--broker', type=str, nargs=1,
             help='Send MQTT messages to this MQTT Broker.')
 
@@ -73,7 +73,7 @@ def encode_lights(lights):
     return encoding
 
 
-def rfid_command(args):
+def nfc_command(args):
     if args.listen:
         listen(args.uidonly)
     elif args.program:
@@ -123,7 +123,7 @@ def signal_handler(sig, frame):
 
 def setup_pn532():
     # Setup PN532 with SPI connection.
-    print(f'RFID Listen using PN532 with SPI connection ...')
+    print(f'NFC Listen using PN532 with SPI connection ...')
     spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
     pn532 = PN532_SPI(spi, DigitalInOut(board.D4), irq=None, reset=DigitalInOut(board.D20))
     ver = pn532.firmware_version
