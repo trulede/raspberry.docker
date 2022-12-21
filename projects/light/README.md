@@ -76,7 +76,13 @@ Additional parameters to be programmed:
 
 NFC Cards are individually programmed with a feature set that corresponds to the States of the Light Controller. Therefore each NFC Card can  be programmed to have only a subset of the possible Card Behaviours (see following section for a list of those behaviours).
 
-> TODO: Determine NFC Card programming layout. CLI tool will be required.
+#### Card Layout
+
+| Block   | Content  | Notes  |
+|:--|:--|:--|
+| 6 | Name | Card owner name. |
+| 8 | Actions | Encoded list of actions for this card (e.g. "On,Of,Br,Co"). |
+| 9 | Lights | Encoded list of light zones controlled by this card. |
 
 
 #### Card Behaviours
@@ -90,6 +96,69 @@ NFC Cards are individually programmed with a feature set that corresponds to the
 | Lights On | Card touch >1s | Lights Colour (cycle preset colour values each 1s). |
 | Lights Colour | Card remove | Lights On. |
 
+
+#### Shellylight NFC CLI
+
+The Shellylight NFC CLI (see projects/light/shellylight in this repo) can be used
+to Listen, Program and then publish MQTT messages based on card actions.
+
+
+##### Listen
+
+```bash
+$ shellylight nfc --listen
+NFC Listen using PN532 with SPI connection ...
+PN532: ic=50, ver=1, rev=6
+Listening for cards (ctrl-c to exit) ...
+Card found, UID=6a 53 7a 15
+  MiFare Blocks:
+  [00] 6a 53 7a 15 56 08 04 00 62 63 64 65 66 67 68 69    jSz.V...bcdefghi
+  [01] 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+  [02] 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+  [03] 00 00 00 00 00 00 ff 07 80 69 ff ff ff ff ff ff    .........i......
+  [04] 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+  [05] 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00    ................
+  [06] 66 6f 6f 20 20 20 20 20 20 20 20 20 20 20 20 20    foo             
+  [07] 00 00 00 00 00 00 ff 07 80 69 ff ff ff ff ff ff    .........i......
+  [08] 4f 6e 2c 4f 66 2c 42 72 2c 43 6f 20 20 20 20 20    On,Of,Br,Co     
+  [09] 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20                    
+...
+Card removed.
+Listening for cards (ctrl-c to exit) ...
+```
+
+##### Program
+
+```bash
+$ shellylight nfc --program --name foo --actions All
+NFC Listen using PN532 with SPI connection ...
+PN532: ic=50, ver=1, rev=6
+Listening for cards (ctrl-c to exit) ...
+Card found, UID=6a 53 7a 15
+ write b'foo             ' @ 6
+ write b'On,Of,Br,Co     ' @ 8
+ write b'                ' @ 9
+  [06] 66 6f 6f 20 20 20 20 20 20 20 20 20 20 20 20 20    foo             
+  [08] 4f 6e 2c 4f 66 2c 42 72 2c 43 6f 20 20 20 20 20    On,Of,Br,Co     
+  [09] 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20                    
+Card removed.
+```
+
+##### MQTT (publisher)
+
+```bash
+$ shellylight nfc --mqtt --broker red --topic lights 
+NFC Listen using PN532 with SPI connection ...
+PN532: ic=50, ver=1, rev=6
+Listening for cards (ctrl-c to exit) ...
+Card found, UID=03 55 ef 96
+  [06] 66 6f 6f 20 20 20 20 20 20 20 20 20 20 20 20 20    foo             
+  [08] 4f 6e 2c 4f 66 2c 42 72 2c 43 6f 20 20 20 20 20    On,Of,Br,Co     
+  [09] 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20 20                    
+Send to broker:localhost on topic:test ...
+Card removed.
+Listening for cards (ctrl-c to exit) ...
+```
 
 
 ## Bringup

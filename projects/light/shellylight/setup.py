@@ -16,5 +16,6 @@ setup(name='shellylight',
     },
     install_requires = [
         'Adafruit-Blinka',
+        'paho-mqtt',
     ]
 )
