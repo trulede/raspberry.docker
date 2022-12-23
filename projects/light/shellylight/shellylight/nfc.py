@@ -256,11 +256,13 @@ def mqtt(broker, topic, delay):
             except Exception as e:
                 print(e)
         payload = {
+            'event': 'card_on',
             'name': blocks[BLOCK_NAME],
             'actions': decode(blocks[BLOCK_ACTIONS], _actions),
             'lights': decode(blocks[BLOCK_LIGHTS], _lights),
         },
         publish_message(broker, topic, json.dumps(payload))
-        # Wait for the card to be removed.
+        # Wait for the card to be removed, and send an MQTT message to the broker.
         wait_for_no_card(pn532)
-        
+        payload['event'] = 'card_off'
+        publish_message(broker, topic, json.dumps(payload))
